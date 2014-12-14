@@ -31,20 +31,20 @@ std::vector<std::string> GetWords()
     return words;
 }
 
-// Given two words and a DAG, update the nodes in the DAG.
+// Process pairs of words, recursively looking at letters.  Build DAG.
 void ProcessWordPair(const std::string& s1, const std::string s2, Dag* dag)
 {
-    // Find the first letters in the given strings that are different.
     if (s1.empty() || s2.empty())
     {
         return;
     }
 
+    // Find the first letters in the given strings that are different.
     char c1 = s1[0];
     char c2 = s2[0];
     if (c1 != c2)
     {
-        // The letter in s2 is a dependency of the letter in s1.
+        // First make sure both letters are nodes in the dag.
         if (!dag->count(c1))
         {
             dag->insert(std::make_pair(c2, std::unordered_set<char>()));
@@ -54,6 +54,7 @@ void ProcessWordPair(const std::string& s1, const std::string s2, Dag* dag)
             dag->insert(std::make_pair(c2, std::unordered_set<char>()));
         }
 
+        // Then insert c2 as a descendent of c1.
         (*dag)[c1].insert(c2);
 
         return;
@@ -98,7 +99,10 @@ std::list<char> TopoSort(const Dag& dag)
         {
             return;
         }
+
         temp_marked_nodes.insert(n);
+
+        // Iterate through the descendents of n in the graph.
         for (auto it = dag.at(n).begin(); it != dag.at(n).end(); ++it)
         {
             visit(*it);
@@ -108,11 +112,12 @@ std::list<char> TopoSort(const Dag& dag)
         sorted_list.push_front(n);
     };
 
+    // Iterate through nodes in the graph until all are permanently marked.
     for (auto it = dag.begin(); it != dag.end(); ++it)
     {
         if (perm_marked_nodes.size() == dag.size())
         {
-            return sorted_list;
+            break;
         }
 
         visit(it->first);
@@ -123,11 +128,6 @@ std::list<char> TopoSort(const Dag& dag)
 
 int main()
 {
-    // Read input from file.  Store words in vector.
-    // Process pairs of words, recursively looking at letters.  Build DAG.
-    // Topologically sort DAG.
-    // Print result.
-
     std::vector<std::string> words = GetWords();
     Dag dag;
 
@@ -152,6 +152,7 @@ int main()
 
     // Sort it out.
     std::list<char> sort_order = TopoSort(dag);
+
     for (auto it = sort_order.begin(); it != sort_order.end(); ++it)
     {
         std::cout << *it << " ";
