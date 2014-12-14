@@ -4,10 +4,9 @@
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
 #include <vector>
 
-typedef std::unordered_map<char, std::unordered_set<char>> Dag;
+using Dag = std::unordered_map<char, std::unordered_set<char>>;
 
 std::vector<std::string> GetWords();
 void ProcessWordPair(const std::string& s1, const std::string s2, Dag* dag);
